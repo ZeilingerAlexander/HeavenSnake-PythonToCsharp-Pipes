@@ -70,7 +70,27 @@ namespace HeavenSnake
         }
         void PrintGame()
         {
+            // First print empty canvas where eveyrthing will be drawn on top of
+            string EmptyStringToPrint = new string('O', FieldSize.x+1);
+            Console.SetCursorPosition(0, 0);
+            Console.ForegroundColor = ConsoleColor.Gray;
+            for (int yaxisLength = 0; yaxisLength <= FieldSize.y+1; yaxisLength++)
+            {
+                Console.WriteLine(EmptyStringToPrint);
+            }
 
+            // Then print the Snake and its Head
+            Console.SetCursorPosition(Head.Position.x, Head.Position.y);
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.Write('X');
+            foreach (Part SnakePart in Parts)
+            {
+                Console.SetCursorPosition(SnakePart.Position.x, SnakePart.Position.y);
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.Write('X');
+            }
+
+            // lastly print fruit
         }
         /// <summary>
         /// Checks if the Snake head is on the Fruit
