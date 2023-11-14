@@ -32,7 +32,7 @@ namespace HeavenSnake
         /// </summary>
         Program.Vector2INT FieldSize { get; set; }
         Program.Vector2INT FruitPos { get; set; }
-        
+
         void RespawnFruit()
         {
 
@@ -40,6 +40,65 @@ namespace HeavenSnake
         void PrintGame()
         {
 
+        }
+        /// <summary>
+        /// Moves the Snake to the current direction
+        /// </summary>
+        void MoveSnake()
+        {
+            // Move the Entire Snake First so it is on the "old positon"+1 meaning that head is now under piece 1, after this head gets moved
+            foreach (Part SnakePart in Parts)
+            {
+                SnakePart.moveToParent();
+            }
+            // Move the Head
+            switch (HeadRotation)
+            {
+                case Program.Rotation.Up:
+                    // Check if it would go out of bounds
+                    if (Head.Position.y == 0)
+                    {
+                        Head.Position = new Program.Vector2INT() { x = Head.Position.x, y = FieldSize.y };
+                    }
+                    else
+                    {
+                        Head.Position = new Program.Vector2INT() { x = Head.Position.x, y = Head.Position.y - 1 };
+                    }
+                    break;
+                case Program.Rotation.Down:
+                    // Check if it would go out of bounds
+                    if (Head.Position.y == FieldSize.y)
+                    {
+                        Head.Position = new Program.Vector2INT() { x = Head.Position.x, y = 0 };
+                    }
+                    else
+                    {
+                        Head.Position = new Program.Vector2INT() { x = Head.Position.x, y = Head.Position.y + 1 };
+                    }
+                    break;
+                case Program.Rotation.Left:
+                    // Check if it would go out of bounds
+                    if (Head.Position.x == 0)
+                    {
+                        Head.Position = new Program.Vector2INT() { x = FieldSize.x, y = Head.Position.y };
+                    }
+                    else
+                    {
+                        Head.Position = new Program.Vector2INT() { x = Head.Position.x - 1, y = Head.Position.y };
+                    }
+                    break;
+                case Program.Rotation.Right:
+                    // Check if it would go out of bounds
+                    if (Head.Position.x == FieldSize.x)
+                    {
+                        Head.Position = new Program.Vector2INT() { x = 0, y = Head.Position.y };
+                    }
+                    else
+                    {
+                        Head.Position = new Program.Vector2INT() { x = Head.Position.x + 1, y = Head.Position.y };
+                    }
+                    break;
+            }
         }
         /// <summary>
         /// Gets the Input from a user, or Consolekey.Noname if user does not enter a key in a given timespan
@@ -68,21 +127,27 @@ namespace HeavenSnake
                 ConsoleKeysWithActions[key].DynamicInvoke();
             }
         }
-        void MoveUp()
+        /// <summary>
+        /// Handles Direction Change, checks if new direction is valid
+        /// </summary>
+        /// <param name="direction"></param>
+        void HandleDirectionChange(Program.Rotation direction)
         {
+            if (HeadRotation == direction)
+            {
+                return;
+            }
+            // Check if the Direction would go to the opposite
+            if ((HeadRotation == Program.Rotation.Up && direction == Program.Rotation.Down) ||
+                (HeadRotation == Program.Rotation.Down && direction == Program.Rotation.Up) ||
+                (HeadRotation == Program.Rotation.Left && direction == Program.Rotation.Right) ||
+                (HeadRotation == Program.Rotation.Right && direction == Program.Rotation.Left))
+            {
+                return;
+            }
 
-        }
-        void MoveDown()
-        {
-
-        }
-        void MoveLeft()
-        {
-
-        }
-        void MoveRight()
-        {
-
+            // Change Direction
+            HeadRotation = direction;
         }
         void GameLoop()
         {
@@ -95,29 +160,38 @@ namespace HeavenSnake
         {
             // Initialize
             Head = new Part(null);
-            Parts= new List<Part>();
+            Parts = new List<Part>();
             this.FieldSize = FieldSize;
-            ConsoleKeysWithActions = new Dictionary<ConsoleKey, Delegate>();
-
-            // Set the delegates for the console keys
-            ConsoleKeysWithActions.Add(ConsoleKey.W, MoveUp);
-            ConsoleKeysWithActions.Add(ConsoleKey.S, MoveDown);
-            ConsoleKeysWithActions.Add(ConsoleKey.A, MoveLeft);
-            ConsoleKeysWithActions.Add(ConsoleKey.D, MoveRight);
+            ConsoleKeysWithActions = new Dictionary<ConsoleKey, Delegate>
+            {
+                // Set the delegates for the console keys
+                { ConsoleKey.W, () => HandleDirectionChange(Program.Rotation.Up) },
+                { ConsoleKey.S, () => HandleDirectionChange(Program.Rotation.Down) },
+                { ConsoleKey.A, () => HandleDirectionChange(Program.Rotation.Left) },
+                { ConsoleKey.D, () => HandleDirectionChange(Program.Rotation.Right) },
+                { ConsoleKey.UpArrow, () => HandleDirectionChange(Program.Rotation.Up) },
+                { ConsoleKey.DownArrow, () => HandleDirectionChange(Program.Rotation.Down) },
+                { ConsoleKey.LeftArrow, () => HandleDirectionChange(Program.Rotation.Left) },
+                { ConsoleKey.RightArrow, () => HandleDirectionChange(Program.Rotation.Right) }
+            };
 
             // Set the default Position of the Head and Default Rotation
-            Head.Position = new Program.Vector2INT() { x = FieldSize.x/2, y = FieldSize.y/2 };
+            Head.Position = new Program.Vector2INT() { x = FieldSize.x / 2, y = FieldSize.y / 2 };
             HeadRotation = Program.Rotation.Up;
 
             // Create a single default existing part
             Part FirstPart = new Part(Head);
-            FirstPart.Position = new Program.Vector2INT() { y = Head.Position.y-1, x= Head.Position.x };
+            FirstPart.Position = new Program.Vector2INT() { y = Head.Position.y - 1, x = Head.Position.x };
             Parts.Add(FirstPart);
 
             // Spawn The Fruit
             RespawnFruit();
 
             // Start the Game Loop
+            while (true)
+            {
+                GameLoop();
+            }
         }
 
     }
