@@ -4,10 +4,10 @@
     {
         internal enum Rotation
         {
-            Up = 0,
-            Down = 1,
-            Left = 2,
-            Right = 3,
+            Up = 1,
+            Down = 3,
+            Left = 4,
+            Right = 2,
         }
         internal struct Vector2INT
         {

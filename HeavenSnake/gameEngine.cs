@@ -10,15 +10,12 @@ namespace HeavenSnake
     internal class GameEngine
     {
         Random rnd = new Random();
-
+        InputHandler handler { get; set; }
+        Task userInputTask { get; set; }
         /// <summary>
         /// The Time between each movement action
         /// </summary>
         TimeSpan TimeBetweenMovement = TimeSpan.FromSeconds(0.5);
-        /// <summary>
-        /// Contains the key and the method that handles that keys input
-        /// </summary>
-        Dictionary<ConsoleKey, Delegate> ConsoleKeysWithActions { get; set; }
         /// <summary>
         /// Parts exclude the head
         /// </summary>
@@ -42,7 +39,7 @@ namespace HeavenSnake
         Program.Vector2INT[] GetAvailiableFruitPositions()
         {
             // Get all availiable Positions
-            int TotalPositions = (FieldSize.x+1) * (FieldSize.y+1); // Total positions
+            int TotalPositions = (FieldSize.x + 1) * (FieldSize.y + 1); // Total positions
             int FreePositions = TotalPositions - (Parts.Count + 1); // Positions not occupied by parts
             Program.Vector2INT[] AvailiablePositons = new Program.Vector2INT[FreePositions]; // Will contain all availiable positions
             int currentIndexPos = 0; // Temporary variable to store the current index of the array where to write a free position to
@@ -50,7 +47,7 @@ namespace HeavenSnake
             {
                 for (int yAxis = 0; yAxis <= FieldSize.y; yAxis++)
                 {
-                    if (!Parts.Any(p => p.Position.x == xAxis && p.Position.y == yAxis) &&!(Head.Position.x == xAxis && Head.Position.y == yAxis))
+                    if (!Parts.Any(p => p.Position.x == xAxis && p.Position.y == yAxis) && !(Head.Position.x == xAxis && Head.Position.y == yAxis))
                     {
                         // Position is availiable
                         AvailiablePositons[currentIndexPos] = new Program.Vector2INT() { x = xAxis, y = yAxis };
@@ -71,10 +68,10 @@ namespace HeavenSnake
         void PrintGame()
         {
             // First print empty canvas where eveyrthing will be drawn on top of
-            string EmptyStringToPrint = new string('O', FieldSize.x+1);
+            string EmptyStringToPrint = new string('O', FieldSize.x + 1);
             Console.SetCursorPosition(0, 0);
             Console.ForegroundColor = ConsoleColor.Gray;
-            for (int yaxisLength = 0; yaxisLength <= FieldSize.y+1; yaxisLength++)
+            for (int yaxisLength = 0; yaxisLength <= FieldSize.y + 1; yaxisLength++)
             {
                 Console.WriteLine(EmptyStringToPrint);
             }
@@ -97,7 +94,8 @@ namespace HeavenSnake
         /// </summary>
         bool CheckIfEligibleForScore()
         {
-            if (Head.Position.x == FruitPos.x && Head.Position.y == FruitPos.y) { return true; } return false;
+            if (Head.Position.x == FruitPos.x && Head.Position.y == FruitPos.y) { return true; }
+            return false;
         }
         /// <summary>
         /// Moves the Snake to the current direction
@@ -159,32 +157,6 @@ namespace HeavenSnake
             }
         }
         /// <summary>
-        /// Gets the Input from a user, or Consolekey.Noname if user does not enter a key in a given timespan
-        /// </summary>
-        /// <returns></returns>
-        ConsoleKey RequestInput()
-        {
-            ConsoleKey UserInput = ConsoleKey.NoName;
-            var userInputTask = Task.Run(() =>
-            {
-                UserInput = Console.ReadKey().Key;
-            });
-            userInputTask.Wait(TimeBetweenMovement);
-            // UserInput is now either a key they pressed or no name if they didnt press anything in the timespan
-            return UserInput;
-        }
-        /// <summary>
-        /// Handles The Given Consolekey and performs actions depending on it
-        /// </summary>
-        /// <param name="key"></param>
-        void HandleInput(ConsoleKey key)
-        {
-            if (ConsoleKeysWithActions.ContainsKey(key))
-            {
-                ConsoleKeysWithActions[key].DynamicInvoke();
-            }
-        }
-        /// <summary>
         /// Handles Direction Change, checks if new direction is valid
         /// </summary>
         /// <param name="direction"></param>
@@ -210,14 +182,14 @@ namespace HeavenSnake
         {
             // Print the game then wait for input until time is over, handle that input if there even was any then move the snake and check if elegible for score
             PrintGame();
-            ConsoleKey key = RequestInput();
-            HandleInput(key);
+            HandleDirectionChange(handler.LastDirection);
             MoveSnake();
             if (CheckIfEligibleForScore())
             {
                 Score++;
                 RespawnFruit();
             }
+            Thread.Sleep(250);
         }
 
         public GameEngine(Program.Vector2INT FieldSize)
@@ -226,18 +198,10 @@ namespace HeavenSnake
             Head = new Part(null);
             Parts = new List<Part>();
             this.FieldSize = FieldSize;
-            ConsoleKeysWithActions = new Dictionary<ConsoleKey, Delegate>
-            {
-                // Set the delegates for the console keys
-                { ConsoleKey.W, () => HandleDirectionChange(Program.Rotation.Up) },
-                { ConsoleKey.S, () => HandleDirectionChange(Program.Rotation.Down) },
-                { ConsoleKey.A, () => HandleDirectionChange(Program.Rotation.Left) },
-                { ConsoleKey.D, () => HandleDirectionChange(Program.Rotation.Right) },
-                { ConsoleKey.UpArrow, () => HandleDirectionChange(Program.Rotation.Up) },
-                { ConsoleKey.DownArrow, () => HandleDirectionChange(Program.Rotation.Down) },
-                { ConsoleKey.LeftArrow, () => HandleDirectionChange(Program.Rotation.Left) },
-                { ConsoleKey.RightArrow, () => HandleDirectionChange(Program.Rotation.Right) }
-            };
+            handler = new InputHandler();
+            handler.LastDirection = Program.Rotation.Up; // default
+            // Start Pipeline for getting inputs
+            Task.Run(handler.startPipeListener);
 
             // Set the default Position of the Head and Default Rotation
             Head.Position = new Program.Vector2INT() { x = FieldSize.x / 2, y = FieldSize.y / 2 };
