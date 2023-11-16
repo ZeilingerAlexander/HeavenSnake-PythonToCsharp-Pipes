@@ -19,10 +19,10 @@ namespace HeavenSnake
             // Pipe Name = InputHandlerSnake
 
             // Create Pipe Server stream
-            NamedPipeServerStream pipestream = new NamedPipeServerStream("InputHandlerSnakes");
-            pipestream.WaitForConnection();
+            NamedPipeServerStream server = new NamedPipeServerStream("InputHandlerSnakes");
+            server.WaitForConnection();
 
-            BinaryReader br = new BinaryReader(pipestream);
+            BinaryReader br = new BinaryReader(server);
             while (true)
             {
                 try
@@ -34,6 +34,8 @@ namespace HeavenSnake
                 }
                 catch (EndOfStreamException)
                 {
+                    server.Close();
+                    server.Dispose();
                     while (true)
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
@@ -42,7 +44,6 @@ namespace HeavenSnake
                 }
                 catch (Exception)
                 {
-                    // failed since input wasnt 1 2 3 or 4 so just ignore lol
                 }
             }
         }
