@@ -1,7 +1,7 @@
 import keyboard
-import struct
+import time
 
-f = open(r'\\.\pipe\InputHandlerSnake', 'r+b', 0)
+f = open(r'\\.\pipe\InputHandlerSnakes', 'r+b', 0)
 
 # ask for input and put it in correct format 1up,2right,3down,4left
 def handleUpKey(e):
@@ -27,4 +27,5 @@ keyboard.on_press_key("s", handleDownKey)
 keyboard.on_press_key("a", handleLeftKey)
 
 while True:
+    time.sleep(1)
     pass

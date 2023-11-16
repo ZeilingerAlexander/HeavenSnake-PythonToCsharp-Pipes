@@ -19,7 +19,7 @@ namespace HeavenSnake
             // Pipe Name = InputHandlerSnake
 
             // Create Pipe Server stream
-            NamedPipeServerStream pipestream = new NamedPipeServerStream("InputHandlerSnake");
+            NamedPipeServerStream pipestream = new NamedPipeServerStream("InputHandlerSnakes");
             pipestream.WaitForConnection();
 
             BinaryReader br = new BinaryReader(pipestream);
