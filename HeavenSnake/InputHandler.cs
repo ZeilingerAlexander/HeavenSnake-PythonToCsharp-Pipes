@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.IO.Pipes;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO.Pipes;
 
 namespace HeavenSnake
 {
@@ -27,8 +21,7 @@ namespace HeavenSnake
             {
                 try
                 {
-                    var len = (int)br.ReadUInt32();            // Read string length, this needs to be one since before reading we need to see how far we are reading
-                    var str = new string(br.ReadChars(len));   // Read string with lenghsdf
+                    var str = new string(br.ReadChars(1));
 
                     LastDirection = (Program.Rotation)int.Parse(str);
                 }

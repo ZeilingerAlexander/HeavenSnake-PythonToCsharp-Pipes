@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-namespace HeavenSnake
+﻿namespace HeavenSnake
 {
     internal class GameEngine
     {
@@ -88,6 +81,12 @@ namespace HeavenSnake
             }
 
             // lastly print fruit
+            Console.SetCursorPosition(FruitPos.x, FruitPos.y);
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write("@");
+
+            // Set cursor to 0
+            Console.SetCursorPosition(0, 0);
         }
         /// <summary>
         /// Checks if the Snake head is on the Fruit
@@ -178,6 +177,11 @@ namespace HeavenSnake
             // Change Direction
             HeadRotation = direction;
         }
+        void SpawnNewPartOnSnake()
+        {
+            Part p = new Part(Parts.Last());
+            Parts.Add(p);
+        }
         void GameLoop()
         {
             // Print the game then wait for input until time is over, handle that input if there even was any then move the snake and check if elegible for score
@@ -187,6 +191,7 @@ namespace HeavenSnake
             if (CheckIfEligibleForScore())
             {
                 Score++;
+                SpawnNewPartOnSnake();
                 RespawnFruit();
             }
             Thread.Sleep(250);

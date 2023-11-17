@@ -27,5 +27,5 @@ keyboard.on_press_key("s", handleDownKey)
 keyboard.on_press_key("a", handleLeftKey)
 
 while True:
-    time.sleep(1)
+    time.sleep(1000000)
     pass
