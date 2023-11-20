@@ -7,4 +7,14 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="InputHandler\InputHandler.py" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="InputHandler\InputHandler.py">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
 </Project>
