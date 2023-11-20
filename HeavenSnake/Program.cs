@@ -30,7 +30,7 @@
             while (fieldSize.x < minsize && fieldSize.y < minsize)
             {
                 Console.Clear();
-                Console.WriteLine("Please Input a Field size x y with a minimum of size " + minsize + 1); // +1 because the shown size is 0 1 meaning if minsize 1 it is 2 displayed
+                Console.WriteLine("Please Input a Field size x y with a minimum of size " + (minsize + 1)); // +1 because the shown size is 0 1 meaning if minsize 1 it is 2 displayed
                 string? input = Console.ReadLine();
                 if (input == null) { continue; }
                 try
