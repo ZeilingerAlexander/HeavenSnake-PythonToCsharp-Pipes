@@ -5,7 +5,7 @@ Takes Inputs from a Python Program that sends the Inputs recieved over a pipelin
 
 How to run with Debugging :
 
-Make sure the Folder containing the Python InpuHandler named "InputHandler" is inside your output directory, otherwise the program is unable to find the python file
+Make sure the Folder containing the Python InputHandler named "InputHandler" is inside your output directory, otherwise the program is unable to find the python file
 
 
 Requirements :
