@@ -197,6 +197,50 @@
             }
         }
         /// <summary>
+        /// Checks if head is inside part
+        /// </summary>
+        /// <returns></returns>
+        bool CheckIfHeadInPart()
+        {
+            if (Parts.Any(p => p.Position.x == Head.Position.x && p.Position.y == Head.Position.y))
+            {
+                return true;
+            }
+            return false;
+        }
+        /// <summary>
+        /// Game Over Screen
+        /// </summary>
+        void GameOver()
+        {
+            Console.Clear();
+
+            // Show Game over for 3 Seconds
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("   _____          __  __ ______    ______      ________ _____  \r\n  / ____|   /\\   |  \\/  |  ____|  / __ \\ \\    / /  ____|  __ \\ \r\n | |  __   /  \\  | \\  / | |__    | |  | \\ \\  / /| |__  | |__) |\r\n | | |_ | / /\\ \\ | |\\/| |  __|   | |  | |\\ \\/ / |  __| |  _  / \r\n | |__| |/ ____ \\| |  | | |____  | |__| | \\  /  | |____| | \\ \\ \r\n  \\_____/_/    \\_\\_|  |_|______|  \\____/   \\/   |______|_|  \\_\\\r\n                                                               \r\n                                                               ");
+            Thread.Sleep(TimeSpan.FromSeconds(3));
+
+            // Reset Snake
+            Parts = new List<Part>();
+            Head.Position = new Program.Vector2INT() { x = FieldSize.x / 2, y = FieldSize.y / 2 };
+            handler.LastDirection = Program.Rotation.Up;
+            HeadRotation = Program.Rotation.Up;
+            // Create a single default existing part
+            Part FirstPart = new Part(Head);
+            FirstPart.Position = new Program.Vector2INT() { y = Head.Position.y - 1, x = Head.Position.x };
+            Parts.Add(FirstPart);
+            Score = 0;
+
+            // Spawn The Fruit
+            RespawnFruit();
+
+            // Clear Console Again to remove the Game over
+            Console.Clear();
+
+            // After this game just continues
+        }
+        /// <summary>
         /// Handles Direction Change, checks if new direction is valid
         /// </summary>
         /// <param name="direction"></param>
@@ -230,6 +274,10 @@
             Thread.Sleep(TimeBetweenMovement);
             HandleDirectionChange(handler.LastDirection);
             MoveSnake();
+            if (CheckIfHeadInPart())
+            {
+                GameOver();
+            }
             if (CheckIfEligibleForScore())
             {
                 Score++;
