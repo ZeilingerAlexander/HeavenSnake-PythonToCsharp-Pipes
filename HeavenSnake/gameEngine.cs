@@ -267,6 +267,17 @@
             Part p = new Part(Parts.Last());
             Parts.Add(p);
         }
+        void StartPythonClient()
+        {
+
+            System.Diagnostics.Process process = new System.Diagnostics.Process();
+            System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
+            startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+            startInfo.FileName = "cmd.exe";
+            startInfo.Arguments = "/C python " + @"C:\Users\AlexanderZeilinger\source\repos\HeavenSnake\InputHandler.py";
+            process.StartInfo = startInfo;
+            process.Start();
+        }
         void GameLoop()
         {
             // Print the game then wait for input until time is over, handle that input if there even was any then move the snake and check if elegible for score
@@ -308,6 +319,9 @@
 
             // Spawn The Fruit
             RespawnFruit();
+
+            // Start the Python Input Listener
+            StartPythonClient();
 
             // Start the Game Loop
             while (true)
