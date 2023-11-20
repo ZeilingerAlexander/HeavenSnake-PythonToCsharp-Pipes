@@ -2,8 +2,9 @@
 {
     internal class GameEngine
     {
+        public static System.Diagnostics.Process pythonProcess { get; set; }
         Random rnd = new Random();
-        InputHandler handler { get; set; }
+        public static InputHandler handler { get; set; }
         /// <summary>
         /// The Time between each movement action
         /// </summary>
@@ -269,13 +270,15 @@
         }
         void StartPythonClient()
         {
-            System.Diagnostics.Process process = new System.Diagnostics.Process();
+            pythonProcess = new System.Diagnostics.Process();
             System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
             startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
             startInfo.FileName = "cmd.exe";
             startInfo.Arguments = "/C python " + @"InputHandler\InputHandler.py";
-            process.StartInfo = startInfo;
-            process.Start();
+            pythonProcess.StartInfo = startInfo;
+            pythonProcess.Start();
+            // TODO : ON         AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
+            // TERMINATE PROCESS THEN CLOSE PIPELINE we need to store task and procces in variables
         }
         void GameLoop()
         {
@@ -306,7 +309,6 @@
             handler.LastDirection = Program.Rotation.Up; // default
             // Start Pipeline for getting inputs
             Task.Run(handler.startPipeListener);
-
             // Set the default Position of the Head and Default Rotation
             Head.Position = new Program.Vector2INT() { x = FieldSize.x / 2, y = FieldSize.y / 2 };
             HeadRotation = Program.Rotation.Up;

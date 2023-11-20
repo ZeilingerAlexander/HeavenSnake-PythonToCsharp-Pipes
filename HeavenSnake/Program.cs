@@ -15,7 +15,17 @@
         }
         static void Main(string[] args)
         {
-            GameEngine gameEngine = new GameEngine(new Vector2INT() { x=20,y=20});
+            AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
+            new GameEngine(new Vector2INT() { x = 20, y = 20 });
+        }
+
+        private static void CurrentDomain_ProcessExit(object? sender, EventArgs e)
+        {
+            GameEngine.pythonProcess.Kill();
+            GameEngine.handler.Intercept = true;
+            GameEngine.handler.server.Close();
+            GameEngine.handler.server.Dispose();
+            Thread.Sleep(1000);
         }
     }
 }

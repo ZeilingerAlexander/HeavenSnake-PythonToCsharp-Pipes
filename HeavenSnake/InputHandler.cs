@@ -8,12 +8,14 @@ namespace HeavenSnake
     internal class InputHandler
     {
         public Program.Rotation LastDirection { get; set; }
+        public NamedPipeServerStream server { get; set; }
+        public bool Intercept = false;
         public void startPipeListener()
         {
             // Pipe Name = InputHandlerSnake
 
             // Create Pipe Server stream
-            NamedPipeServerStream server = new NamedPipeServerStream("InputHandlerSnakes");
+            server = new NamedPipeServerStream("InputHandlerSnakes");
             server.WaitForConnection();
 
             BinaryReader br = new BinaryReader(server);
@@ -21,6 +23,10 @@ namespace HeavenSnake
             {
                 try
                 {
+                    if (Intercept)
+                    {
+                        throw new EndOfStreamException();
+                    }
                     var str = new string(br.ReadChars(1));
 
                     LastDirection = (Program.Rotation)int.Parse(str);
