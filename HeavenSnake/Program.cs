@@ -26,10 +26,11 @@
         static Vector2INT RequestFieldSizeInput(int minsize)
         {
             Vector2INT fieldSize = new Vector2INT();
+            minsize--; // -1 so it is in the actual format (starting from 0)
             while (fieldSize.x < minsize && fieldSize.y < minsize)
             {
                 Console.Clear();
-                Console.WriteLine("Please Input a Field size x y with a minimum of size 2");
+                Console.WriteLine("Please Input a Field size x y with a minimum of size " + minsize + 1); // +1 because the shown size is 0 1 meaning if minsize 1 it is 2 displayed
                 string? input = Console.ReadLine();
                 if (input == null) { continue; }
                 try
@@ -51,7 +52,7 @@
                     string[]? highestSplit = availiableSplits.Find(a => a.Length == availiableSplits.Max(x => x.Length));
                     int x = int.Parse(highestSplit[0]);
                     int y = int.Parse(highestSplit[1]);
-                    fieldSize = new Vector2INT() { x = x, y = y };
+                    fieldSize = new Vector2INT() { x = x - 1, y = y - 1 };
                 }
                 catch (Exception) { }
             }
