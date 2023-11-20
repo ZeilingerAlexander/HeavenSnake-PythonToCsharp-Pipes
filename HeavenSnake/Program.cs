@@ -46,7 +46,7 @@
                         input.Split("-"),
                         input.Split("w"),
                         input.Split("!"),
-                        input.Split("  "),
+                        input.Split("  ")
                     };
                     string[]? highestSplit = availiableSplits.Find(a => a.Length == availiableSplits.Max(x => x.Length));
                     int x = int.Parse(highestSplit[0]);
@@ -55,6 +55,7 @@
                 }
                 catch (Exception) { }
             }
+            Console.Clear();
             return fieldSize;
         }
 
