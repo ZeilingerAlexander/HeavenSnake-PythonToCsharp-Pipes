@@ -273,7 +273,7 @@
             System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
             startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
             startInfo.FileName = "cmd.exe";
-            startInfo.Arguments = "/C python " + @"C:\Users\AlexanderZeilinger\source\repos\HeavenSnake\InputHandler.py";
+            startInfo.Arguments = "/C python " + @"InputHandler\InputHandler.py";
             process.StartInfo = startInfo;
             process.Start();
         }
