@@ -80,7 +80,7 @@
             }
             catch (ArgumentOutOfRangeException) { return; }
             Console.ForegroundColor = ConsoleColor.Gray;
-            for (int yaxisLength = 0; yaxisLength <= FieldSize.y + 1; yaxisLength++)
+            for (int yaxisLength = 0; yaxisLength <= FieldSize.y; yaxisLength++)
             {
                 Console.WriteLine(EmptyStringToPrint);
             }
@@ -277,8 +277,6 @@
             startInfo.Arguments = "/C python " + @"InputHandler\InputHandler.py";
             pythonProcess.StartInfo = startInfo;
             pythonProcess.Start();
-            // TODO : ON         AppDomain.CurrentDomain.ProcessExit += new EventHandler(CurrentDomain_ProcessExit);
-            // TERMINATE PROCESS THEN CLOSE PIPELINE we need to store task and procces in variables
         }
         void GameLoop()
         {
