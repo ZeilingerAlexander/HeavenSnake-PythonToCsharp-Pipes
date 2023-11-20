@@ -16,7 +16,46 @@
         static void Main(string[] args)
         {
             AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
-            new GameEngine(new Vector2INT() { x = 20, y = 20 });
+            new GameEngine(RequestFieldSizeInput(2));
+        }
+
+        /// <summary>
+        /// Request a valid Vector2Int from the user thats bigger then minsize in both direction
+        /// </summary>
+        /// <returns></returns>
+        static Vector2INT RequestFieldSizeInput(int minsize)
+        {
+            Vector2INT fieldSize = new Vector2INT();
+            while (fieldSize.x < minsize && fieldSize.y < minsize)
+            {
+                Console.Clear();
+                Console.WriteLine("Please Input a Field size x y with a minimum of size 2");
+                string? input = Console.ReadLine();
+                if (input == null) { continue; }
+                try
+                {
+                    List<string[]> availiableSplits = new List<string[]>()
+                    {
+                        input.Split(" "),
+                        input.Split("/"),
+                        input.Split("-"),
+                        input.Split("_"),
+                        input.Split(";"),
+                        input.Split("x"),
+                        input.Split("*"),
+                        input.Split("-"),
+                        input.Split("w"),
+                        input.Split("!"),
+                        input.Split("  "),
+                    };
+                    string[]? highestSplit = availiableSplits.Find(a => a.Length == availiableSplits.Max(x => x.Length));
+                    int x = int.Parse(highestSplit[0]);
+                    int y = int.Parse(highestSplit[1]);
+                    fieldSize = new Vector2INT() { x = x, y = y };
+                }
+                catch (Exception) { }
+            }
+            return fieldSize;
         }
 
         private static void CurrentDomain_ProcessExit(object? sender, EventArgs e)
