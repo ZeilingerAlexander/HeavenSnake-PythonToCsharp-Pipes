@@ -34,7 +34,7 @@
             // Get all availiable Positions
             int TotalPositions = (FieldSize.x + 1) * (FieldSize.y + 1); // Total positions
             int FreePositions = TotalPositions - (Parts.Count + 1); // Positions not occupied by parts
-            Program.Vector2INT[] AvailiablePositons = new Program.Vector2INT[FreePositions]; // Will contain all availiable positions
+            Program.Vector2INT[] AvailiablePositons = new Program.Vector2INT[FreePositions + 1]; // Will contain all availiable positions
             int currentIndexPos = 0; // Temporary variable to store the current index of the array where to write a free position to
             for (int xAxis = 0; xAxis <= FieldSize.x; xAxis++)
             {
@@ -93,7 +93,10 @@
         /// </summary>
         bool CheckIfEligibleForScore()
         {
-            if (Head.Position.x == FruitPos.x && Head.Position.y == FruitPos.y) { return true; }
+            if (Head.Position.x == FruitPos.x && Head.Position.y == FruitPos.y)
+            {
+                return true;
+            }
             return false;
         }
         /// <summary>
@@ -102,9 +105,9 @@
         void MoveSnake()
         {
             // Move the Entire Snake First so it is on the "old positon"+1 meaning that head is now under piece 1, after this head gets moved
-            foreach (Part SnakePart in Parts)
+            for (int i = Parts.Count - 1; i >= 0; i--)
             {
-                SnakePart.moveToParent();
+                Parts[i].moveToParent();
             }
             // Move the Head
             switch (HeadRotation)
@@ -186,6 +189,7 @@
         {
             // Print the game then wait for input until time is over, handle that input if there even was any then move the snake and check if elegible for score
             PrintGame();
+            Thread.Sleep(250);
             HandleDirectionChange(handler.LastDirection);
             MoveSnake();
             if (CheckIfEligibleForScore())
@@ -194,7 +198,6 @@
                 SpawnNewPartOnSnake();
                 RespawnFruit();
             }
-            Thread.Sleep(250);
         }
 
         public GameEngine(Program.Vector2INT FieldSize)
