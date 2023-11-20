@@ -4,11 +4,10 @@
     {
         Random rnd = new Random();
         InputHandler handler { get; set; }
-        Task userInputTask { get; set; }
         /// <summary>
         /// The Time between each movement action
         /// </summary>
-        TimeSpan TimeBetweenMovement = TimeSpan.FromSeconds(0.5);
+        TimeSpan TimeBetweenMovement = TimeSpan.FromSeconds(0.25);
         /// <summary>
         /// Parts exclude the head
         /// </summary>
@@ -60,9 +59,25 @@
         }
         void PrintGame()
         {
+            // minimum size needed to print (size.y + 3 since we print score on size.y + 2 with is only shown on size.y + 3 AND size.x + 1 since we print to size.x + 1)
+            if (Console.BufferHeight < FieldSize.y + 3 || Console.BufferWidth < FieldSize.x + 1)
+            {
+                Console.Clear();
+                Console.SetCursorPosition(0, 0);
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("WINDOW TOO SMALL");
+                Console.WriteLine("WINDOW TOO SMALL");
+                Console.WriteLine("WINDOW TOO SMALL");
+                return;
+            }
+
             // First print empty canvas where eveyrthing will be drawn on top of
             string EmptyStringToPrint = new string('O', FieldSize.x + 1);
-            Console.SetCursorPosition(0, 0);
+            try
+            {
+                Console.SetCursorPosition(0, 0);
+            }
+            catch (ArgumentOutOfRangeException) { return; }
             Console.ForegroundColor = ConsoleColor.Gray;
             for (int yaxisLength = 0; yaxisLength <= FieldSize.y + 1; yaxisLength++)
             {
@@ -70,20 +85,43 @@
             }
 
             // Then print the Snake and its Head
-            Console.SetCursorPosition(Head.Position.x, Head.Position.y);
+            try
+            {
+                Console.SetCursorPosition(Head.Position.x, Head.Position.y);
+            }
+            catch (ArgumentOutOfRangeException) { return; }
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.Write('X');
             foreach (Part SnakePart in Parts)
             {
-                Console.SetCursorPosition(SnakePart.Position.x, SnakePart.Position.y);
+                try
+                {
+                    Console.SetCursorPosition(SnakePart.Position.x, SnakePart.Position.y);
+                }
+                catch (ArgumentOutOfRangeException) { return; }
                 Console.ForegroundColor = ConsoleColor.Blue;
                 Console.Write('X');
             }
 
             // lastly print fruit
-            Console.SetCursorPosition(FruitPos.x, FruitPos.y);
+            try
+            {
+                Console.SetCursorPosition(FruitPos.x, FruitPos.y);
+            }
+            catch (ArgumentOutOfRangeException) { return; }
             Console.ForegroundColor = ConsoleColor.Green;
             Console.Write("@");
+
+            // Then print the score at the bottom
+            try
+            {
+                Console.SetCursorPosition(0, FieldSize.y + 2);
+            }
+            catch (ArgumentOutOfRangeException) { return; }
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write("SCORE : ");
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write(Score);
 
             // Set cursor to 0
             Console.SetCursorPosition(0, 0);
@@ -189,7 +227,7 @@
         {
             // Print the game then wait for input until time is over, handle that input if there even was any then move the snake and check if elegible for score
             PrintGame();
-            Thread.Sleep(250);
+            Thread.Sleep(TimeBetweenMovement);
             HandleDirectionChange(handler.LastDirection);
             MoveSnake();
             if (CheckIfEligibleForScore())
