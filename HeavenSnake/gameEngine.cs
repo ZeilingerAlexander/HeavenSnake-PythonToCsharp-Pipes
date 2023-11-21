@@ -232,6 +232,7 @@
             FirstPart.Position = new Program.Vector2INT() { y = Head.Position.y - 1, x = Head.Position.x };
             Parts.Add(FirstPart);
             Score = 0;
+            TimeBetweenMovement = TimeSpan.FromSeconds(0.25);
 
             // Spawn The Fruit
             RespawnFruit();
@@ -294,6 +295,8 @@
                 Score++;
                 SpawnNewPartOnSnake();
                 RespawnFruit();
+                // Make the speed more
+                TimeBetweenMovement -= TimeSpan.FromMilliseconds(2.5);
             }
         }
 
