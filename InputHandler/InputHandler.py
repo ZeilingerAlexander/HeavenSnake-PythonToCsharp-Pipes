@@ -16,11 +16,15 @@ def handleDownKey(e):
 def handleLeftKey(e):
     f.write(bytes("4", 'utf-8'))
     f.seek(0)
+def handleSpaceKey(e):
+    f.write(bytes("5", "utf-8"))
+    f.seek(0)
 
 keyboard.on_press_key("w", handleUpKey)
 keyboard.on_press_key("d", handleRightKey)
 keyboard.on_press_key("s", handleDownKey)
 keyboard.on_press_key("a", handleLeftKey)
+keyboard.on_press_key("space", handleSpaceKey)
 
 while True:
     time.sleep(1000000)

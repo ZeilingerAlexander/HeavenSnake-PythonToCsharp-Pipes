@@ -282,7 +282,7 @@
         {
             // Print the game then wait for input until time is over, handle that input if there even was any then move the snake and check if elegible for score
             PrintGame();
-            Thread.Sleep(TimeBetweenMovement);
+            Thread.Sleep(handler.SpaceDown ? TimeBetweenMovement / 4 : TimeBetweenMovement);
             HandleDirectionChange(handler.LastDirection);
             MoveSnake();
             if (CheckIfHeadInPart())

@@ -8,6 +8,7 @@ namespace HeavenSnake
     internal class InputHandler
     {
         public Program.Rotation LastDirection { get; set; }
+        public bool SpaceDown { get; set; }
         public NamedPipeServerStream server { get; set; }
         public bool Intercept = false;
         public void startPipeListener()
@@ -28,8 +29,16 @@ namespace HeavenSnake
                         throw new EndOfStreamException();
                     }
                     var str = new string(br.ReadChars(1));
-
-                    LastDirection = (Program.Rotation)int.Parse(str);
+                    if (int.Parse(str) == 5)
+                    {
+                        // User pressed Space
+                        SpaceDown = !SpaceDown;
+                        server.Flush();
+                    }
+                    else
+                    {
+                        LastDirection = (Program.Rotation)int.Parse(str);
+                    }
                 }
                 catch (EndOfStreamException)
                 {
