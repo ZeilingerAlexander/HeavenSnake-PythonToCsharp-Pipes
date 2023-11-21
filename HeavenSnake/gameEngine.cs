@@ -1,4 +1,6 @@
-﻿namespace HeavenSnake
+﻿using System.Reflection.Metadata.Ecma335;
+
+namespace HeavenSnake
 {
     internal class GameEngine
     {
@@ -54,6 +56,11 @@
         void RespawnFruit()
         {
             Program.Vector2INT[] AvailiablePositons = GetAvailiableFruitPositions();
+            if (AvailiablePositons.Length == 0)
+            {
+                GameOver();
+                return;
+            }
             // Get a Random Position out of the availiable positions
             int rndIndex = rnd.Next(0, AvailiablePositons.Length);
             FruitPos = AvailiablePositons[rndIndex];
