@@ -87,6 +87,23 @@
             int rndIndex = rnd.Next(0, AvailiablePositons.Length);
             FruitPos = AvailiablePositons[rndIndex];
         }
+        /// <summary>
+        /// Prints the Full Empty Canvas
+        /// </summary>
+        void PrintEmptyCanvas()
+        {
+            string EmptyStringToPrint = new string('O', FieldSize.x + 1);
+            try
+            {
+                Console.SetCursorPosition(0, 0);
+            }
+            catch (ArgumentOutOfRangeException) { return; }
+            Console.ForegroundColor = ConsoleColor.Gray;
+            for (int yaxisLength = 0; yaxisLength <= FieldSize.y; yaxisLength++)
+            {
+                Console.WriteLine(EmptyStringToPrint);
+            }
+        }
         void PrintGame()
         {
             // minimum size needed to print (size.y + 3 since we print score on size.y + 2 with is only shown on size.y + 3 AND size.x + 1 since we print to size.x + 1)
@@ -100,8 +117,6 @@
                 Console.WriteLine("WINDOW TOO SMALL");
                 return;
             }
-
-
 
             // Get difference of both lists so we can print what changed, removed and added refers to the visual effect
             (List<Program.Vector2INT>, List<Part>) differences = SaveState.CalculatePartListDifference(LastSavedState.PartPositions, Parts);
@@ -128,15 +143,16 @@
                 Console.Write('O');
             }
             // Check if FruitPos changed, this also means that score must have changed
-            if (FruitPos.x != LastSavedState.FruitPos.x && FruitPos.y != LastSavedState.FruitPos.y)
+            if (FruitPos.x != LastSavedState.FruitPos.x || FruitPos.y != LastSavedState.FruitPos.y)
             {
                 // New FruitPos must be a fruit since it just respawned
                 try
                 {
-                    // Print fruit on new fruit pos
+                    // Print fruit on new fruit pos and also save the new fruit pos
                     Console.SetCursorPosition(FruitPos.x, FruitPos.y);
-                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.Write("@");
+                    LastSavedState.FruitPos = FruitPos;
                 }
                 catch (ArgumentOutOfRangeException) { return; }
 
@@ -167,7 +183,6 @@
 
             // Save the Current State as last state 
             LastSavedState.PartPositions = Parts.Select(p => p.Position).ToList();
-            LastSavedState.FruitPos = FruitPos;
             LastSavedState.Head = Head;
         }
         /// <summary>
@@ -283,6 +298,9 @@
             // Clear Console Again to remove the Game over
             Console.Clear();
 
+            // Print empty canvas
+            PrintEmptyCanvas();
+
             // After this game just continues
         }
         /// <summary>
@@ -369,6 +387,9 @@
 
             // Start the Python Input Listener
             StartPythonClient();
+
+            // Print empty canvas once
+            PrintEmptyCanvas();
 
             // Start the Game Loop
             while (true)
