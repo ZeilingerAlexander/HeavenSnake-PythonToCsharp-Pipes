@@ -129,7 +129,7 @@
                 }
                 catch (ArgumentOutOfRangeException) { return; }
                 Console.ForegroundColor = ConsoleColor.Gray;
-                Console.WriteLine("X");
+                Console.WriteLine("O");
             }
             foreach (Part AddedPart in differences.Item2)
             {
@@ -185,13 +185,6 @@
             catch (ArgumentOutOfRangeException) { return; }
             Console.ForegroundColor = ConsoleColor.Green;
             Console.Write('|');
-
-            // Set cursor to the empty spot between canvas and score
-            try
-            {
-                Console.SetCursorPosition(0, FieldSize.y + 1);
-            }
-            catch (ArgumentOutOfRangeException) { return; }
 
             // Save the Current State as last state 
             LastSavedState.PartPositions = Parts.Select(p => p.Position).ToList();
