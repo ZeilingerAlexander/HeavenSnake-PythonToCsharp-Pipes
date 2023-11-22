@@ -23,7 +23,7 @@
         /// Request a valid Vector2Int from the user thats bigger then minsize in both direction
         /// </summary>
         /// <returns></returns>
-        static Vector2INT RequestFieldSizeInput(int minsize)
+        public static Vector2INT RequestFieldSizeInput(int minsize)
         {
             Vector2INT fieldSize = new Vector2INT();
             minsize--; // -1 so it is in the actual format (starting from 0)

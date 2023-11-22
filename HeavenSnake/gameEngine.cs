@@ -1,7 +1,28 @@
-﻿using System.Reflection.Metadata.Ecma335;
-
-namespace HeavenSnake
+﻿namespace HeavenSnake
 {
+    class SaveState
+    {
+        public SaveState()
+        {
+            PartPositions = new();
+        }
+        public List<Program.Vector2INT> PartPositions { get; set; }
+        public Part Head { get; set; }
+        public int Score { get; set; }
+        public Program.Vector2INT FruitPos { get; set; }
+
+        /// <summary>
+        /// Calculates the difference between the two parts list
+        /// </summary>
+        /// <param name="oldParts"></param>
+        /// <param name="CurrentParts"></param>
+        /// <returns>A tuple with 0 containing all the ones present in list1 but not list2, 1 containing all the ones present in list2 but not in list 1</returns>
+        public static (List<Program.Vector2INT>, List<Part>) CalculatePartListDifference(List<Program.Vector2INT> list1, List<Part> list2)
+        {
+            return (list1.Where(x => !list2.Any(y => y.Position.x == x.x && y.Position.y == x.y)).ToList(),
+                list2.Where(x => !list1.Any(y => y.x == x.Position.x && y.y == x.Position.y)).ToList());
+        }
+    }
     internal class GameEngine
     {
         public static System.Diagnostics.Process pythonProcess { get; set; }
@@ -26,6 +47,7 @@ namespace HeavenSnake
         /// </summary>
         Program.Vector2INT FieldSize { get; set; }
         Program.Vector2INT FruitPos { get; set; }
+        SaveState LastSavedState { get; set; }
 
         /// <summary>
         /// Gets all the positions availiabel for the fruit to spawn into
@@ -79,20 +101,58 @@ namespace HeavenSnake
                 return;
             }
 
-            // First print empty canvas where eveyrthing will be drawn on top of
-            string EmptyStringToPrint = new string('O', FieldSize.x + 1);
-            try
+
+
+            // Get difference of both lists so we can print what changed, removed and added refers to the visual effect
+            (List<Program.Vector2INT>, List<Part>) differences = SaveState.CalculatePartListDifference(LastSavedState.PartPositions, Parts);
+            foreach (Program.Vector2INT RemovedPart in differences.Item1)
             {
-                Console.SetCursorPosition(0, 0);
+                // Print empty space where part was removed
+                try
+                {
+                    Console.SetCursorPosition(RemovedPart.x, RemovedPart.y);
+                }
+                catch (ArgumentOutOfRangeException) { return; }
+                Console.ForegroundColor = ConsoleColor.Gray;
+                Console.WriteLine("X");
             }
-            catch (ArgumentOutOfRangeException) { return; }
-            Console.ForegroundColor = ConsoleColor.Gray;
-            for (int yaxisLength = 0; yaxisLength <= FieldSize.y; yaxisLength++)
+            foreach (Part AddedPart in differences.Item2)
             {
-                Console.WriteLine(EmptyStringToPrint);
+                // Print part where part was added
+                try
+                {
+                    Console.SetCursorPosition(AddedPart.Position.x, AddedPart.Position.y);
+                }
+                catch (ArgumentOutOfRangeException) { return; }
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.Write('O');
+            }
+            // Check if FruitPos changed, this also means that score must have changed
+            if (FruitPos.x != LastSavedState.FruitPos.x && FruitPos.y != LastSavedState.FruitPos.y)
+            {
+                // New FruitPos must be a fruit since it just respawned
+                try
+                {
+                    // Print fruit on new fruit pos
+                    Console.SetCursorPosition(FruitPos.x, FruitPos.y);
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write("@");
+                }
+                catch (ArgumentOutOfRangeException) { return; }
+
+                // Then print the score at the bottom
+                try
+                {
+                    Console.SetCursorPosition(0, FieldSize.y + 2);
+                }
+                catch (ArgumentOutOfRangeException) { return; }
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write("SCORE : ");
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.Write(Score);
             }
 
-            // Then print the Snake and its Head
+            // Head must have moved so just print that, old head pos must have been overwritten with a part anwyways
             try
             {
                 Console.SetCursorPosition(Head.Position.x, Head.Position.y);
@@ -100,39 +160,15 @@ namespace HeavenSnake
             catch (ArgumentOutOfRangeException) { return; }
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.Write('X');
-            foreach (Part SnakePart in Parts)
-            {
-                try
-                {
-                    Console.SetCursorPosition(SnakePart.Position.x, SnakePart.Position.y);
-                }
-                catch (ArgumentOutOfRangeException) { return; }
-                Console.ForegroundColor = ConsoleColor.Blue;
-                Console.Write('X');
-            }
 
-            // lastly print fruit
-            try
-            {
-                Console.SetCursorPosition(FruitPos.x, FruitPos.y);
-            }
-            catch (ArgumentOutOfRangeException) { return; }
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.Write("@");
-
-            // Then print the score at the bottom
-            try
-            {
-                Console.SetCursorPosition(0, FieldSize.y + 2);
-            }
-            catch (ArgumentOutOfRangeException) { return; }
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.Write("SCORE : ");
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.Write(Score);
 
             // Set cursor to 0
             Console.SetCursorPosition(0, 0);
+
+            // Save the Current State as last state 
+            LastSavedState.PartPositions = Parts.Select(p => p.Position).ToList();
+            LastSavedState.FruitPos = FruitPos;
+            LastSavedState.Head = Head;
         }
         /// <summary>
         /// Checks if the Snake head is on the Fruit
@@ -315,6 +351,8 @@ namespace HeavenSnake
             this.FieldSize = FieldSize;
             handler = new InputHandler();
             handler.LastDirection = Program.Rotation.Up; // default
+            LastSavedState = new SaveState();
+
             // Start Pipeline for getting inputs
             Task.Run(handler.startPipeListener);
             // Set the default Position of the Head and Default Rotation
