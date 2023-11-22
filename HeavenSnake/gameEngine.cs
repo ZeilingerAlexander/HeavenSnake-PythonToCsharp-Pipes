@@ -177,9 +177,21 @@
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.Write('X');
 
+            // Always print something on the empty space between canvas and score since thats where new parts are first spawned
+            try
+            {
+                Console.SetCursorPosition(0, FieldSize.y + 1);
+            }
+            catch (ArgumentOutOfRangeException) { return; }
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write('|');
 
-            // Set cursor to 0
-            Console.SetCursorPosition(0, 0);
+            // Set cursor to the empty spot between canvas and score
+            try
+            {
+                Console.SetCursorPosition(0, FieldSize.y + 1);
+            }
+            catch (ArgumentOutOfRangeException) { return; }
 
             // Save the Current State as last state 
             LastSavedState.PartPositions = Parts.Select(p => p.Position).ToList();
@@ -328,6 +340,8 @@
         void SpawnNewPartOnSnake()
         {
             Part p = new Part(Parts.Last());
+            // Set p position to the empty space between the score and canvas
+            p.Position = new Program.Vector2INT() { x = 0, y = FieldSize.y + 1 };
             Parts.Add(p);
         }
         void StartPythonClient()
