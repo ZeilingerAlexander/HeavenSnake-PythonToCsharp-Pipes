@@ -104,18 +104,72 @@
                 Console.WriteLine(EmptyStringToPrint);
             }
         }
+        /// <summary>
+        /// Prints "WINDOW TOO SMALL" until user resizes it, then re-prints everything
+        /// </summary>
+        void WaitUntilCorrectWindowSize()
+        {
+            Console.Clear();
+            while (Console.BufferHeight < FieldSize.y + 3 || Console.BufferWidth < FieldSize.x + 1)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("WINDOW TOO SMALL");
+                Console.WriteLine("WINDOW TOO SMALL");
+                Console.WriteLine("WINDOW TOO SMALL");
+            }
+            // Window Size is correct again, reprint everyhing, if user resizes during this period it will call this method again recursively. this may result in stack overflow excepts
+            Console.Clear();
+            PrintEmptyCanvas();
+
+            // Print Head
+            try
+            {
+                Console.SetCursorPosition(Head.Position.x, Head.Position.y);
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                WaitUntilCorrectWindowSize();
+                return;
+            }
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.Write('X');
+
+            // Print Snake
+            foreach (Part p in Parts)
+            {
+                try
+                {
+                    Console.SetCursorPosition(p.Position.x, p.Position.y);
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    WaitUntilCorrectWindowSize();
+                    return;
+                }
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.Write('O');
+            }
+
+            // Print Fruit
+            try
+            {
+                Console.SetCursorPosition(FruitPos.x, FruitPos.y);
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                WaitUntilCorrectWindowSize();
+                return;
+            }
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.Write("@");
+            LastSavedState.FruitPos = FruitPos;
+        }
         void PrintGame()
         {
             // minimum size needed to print (size.y + 3 since we print score on size.y + 2 with is only shown on size.y + 3 AND size.x + 1 since we print to size.x + 1)
             if (Console.BufferHeight < FieldSize.y + 3 || Console.BufferWidth < FieldSize.x + 1)
             {
-                Console.Clear();
-                Console.SetCursorPosition(0, 0);
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("WINDOW TOO SMALL");
-                Console.WriteLine("WINDOW TOO SMALL");
-                Console.WriteLine("WINDOW TOO SMALL");
-                return;
+                WaitUntilCorrectWindowSize();
             }
 
             // Get difference of both lists so we can print what changed, removed and added refers to the visual effect
@@ -127,7 +181,11 @@
                 {
                     Console.SetCursorPosition(RemovedPart.x, RemovedPart.y);
                 }
-                catch (ArgumentOutOfRangeException) { return; }
+                catch (ArgumentOutOfRangeException)
+                {
+                    WaitUntilCorrectWindowSize();
+                    return;
+                }
                 Console.ForegroundColor = ConsoleColor.Gray;
                 Console.WriteLine("O");
             }
@@ -138,7 +196,11 @@
                 {
                     Console.SetCursorPosition(AddedPart.Position.x, AddedPart.Position.y);
                 }
-                catch (ArgumentOutOfRangeException) { return; }
+                catch (ArgumentOutOfRangeException)
+                {
+                    WaitUntilCorrectWindowSize();
+                    return;
+                }
                 Console.ForegroundColor = ConsoleColor.Blue;
                 Console.Write('O');
             }
@@ -150,18 +212,26 @@
                 {
                     // Print fruit on new fruit pos and also save the new fruit pos
                     Console.SetCursorPosition(FruitPos.x, FruitPos.y);
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.Write("@");
-                    LastSavedState.FruitPos = FruitPos;
                 }
-                catch (ArgumentOutOfRangeException) { return; }
+                catch (ArgumentOutOfRangeException)
+                {
+                    WaitUntilCorrectWindowSize();
+                    return;
+                }
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Write("@");
+                LastSavedState.FruitPos = FruitPos;
 
                 // Then print the score at the bottom
                 try
                 {
                     Console.SetCursorPosition(0, FieldSize.y + 2);
                 }
-                catch (ArgumentOutOfRangeException) { return; }
+                catch (ArgumentOutOfRangeException)
+                {
+                    WaitUntilCorrectWindowSize();
+                    return;
+                }
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.Write("SCORE : ");
                 Console.ForegroundColor = ConsoleColor.Green;
@@ -173,7 +243,11 @@
             {
                 Console.SetCursorPosition(Head.Position.x, Head.Position.y);
             }
-            catch (ArgumentOutOfRangeException) { return; }
+            catch (ArgumentOutOfRangeException)
+            {
+                WaitUntilCorrectWindowSize();
+                return;
+            }
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.Write('X');
 
@@ -182,7 +256,11 @@
             {
                 Console.SetCursorPosition(0, FieldSize.y + 1);
             }
-            catch (ArgumentOutOfRangeException) { return; }
+            catch (ArgumentOutOfRangeException)
+            {
+                WaitUntilCorrectWindowSize();
+                return;
+            }
             Console.ForegroundColor = ConsoleColor.Green;
             Console.Write('|');
 
